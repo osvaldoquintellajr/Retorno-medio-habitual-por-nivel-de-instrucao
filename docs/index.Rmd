@@ -1,0 +1,243 @@
+---
+title: "Rendimento habitual médio por nível de instrução"
+author: "Osvaldo Martins Quintella Junior"
+date: "Last edited `r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    df_print: paged
+email_adress: osvaldoquintellajr@gmail.com
+github_repo: https://github.com/osvaldoquintellajr/Mapa-interativo-com-os-resultados-municipais-do-IDEB-2023
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(fig.align = 'center')
+options(scipen=999)
+```
+
+```{r loading packages , include = FALSE, warning=FALSE, message=FALSE}
+library(PNADcIBGE)
+library(survey)
+library(tidyverse)
+library(zoo)
+library(ggthemes)
+library(anytime)
+```
+
+
+
+```{r definindo variáveis , include = FALSE, message=FALSE, warning=FALSE}
+variaveis <- c("UF","Capital","V1027","V1028","V2007","V2009", "V2010",
+                 "V3009A","V3014", "V4010","V4012","V4028", "V4033", "V40331",
+                 "V40332", "V403311","V403312", "V403322","V4034","V40341", 
+                 "VD3004", "VD4001","VD4002" ,"VD4019", "VD4020")
+```
+
+
+```{r baixar dados para 2020,  include = FALSE, warning=FALSE, message=FALSE}
+pnadcyear20quarter01 <- get_pnadc(year=2020,quarter=1,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear20quarter02 <- get_pnadc(year=2020,quarter=2,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear20quarter03 <- get_pnadc(year=2020,quarter=3,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear20quarter04 <- get_pnadc(year=2020,quarter=4,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+```
+
+```{r rendimento habitual por nível de instrução para 2020,  include = FALSE, warning=FALSE, message=FALSE}
+rendimento.habitual.nivel.instrucao20.01 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear20quarter01, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao20.02 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear20quarter02, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao20.03 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear20quarter03, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao20.04 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear20quarter04, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+rm(pnadcyear20quarter01, pnadcyear20quarter02, pnadcyear20quarter03, pnadcyear20quarter04)
+
+```
+
+```{r baixar dados para 2021,  include = FALSE, warning=FALSE, message=FALSE}
+pnadcyear21quarter01 <- get_pnadc(year=2021,quarter=1,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear21quarter02 <- get_pnadc(year=2021,quarter=2,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear21quarter03 <- get_pnadc(year=2021,quarter=3,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear21quarter04 <- get_pnadc(year=2021,quarter=4,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+```
+
+```{r rendimento habitual por nível de instrução para 2021,  include = FALSE, warning=FALSE, message=FALSE}
+
+rendimento.habitual.nivel.instrucao21.01 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear21quarter01, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao21.02 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear21quarter02, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao21.03 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear21quarter03, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao21.04 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear21quarter04, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+rm(pnadcyear21quarter01, pnadcyear21quarter02, pnadcyear21quarter03, pnadcyear21quarter04)
+
+```
+
+```{r baixar dados para 2022,  include = FALSE, warning=FALSE, message=FALSE}
+pnadcyear22quarter01 <- get_pnadc(year=2022,quarter=1,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear22quarter02 <- get_pnadc(year=2022,quarter=2,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear22quarter03 <- get_pnadc(year=2022,quarter=3,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear22quarter04 <- get_pnadc(year=2022,quarter=4,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+```
+
+```{r rendimento habitual por nível de instrução para 2022,  include = FALSE, warning=FALSE, message=FALSE}
+rendimento.habitual.nivel.instrucao22.01 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear22quarter01, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao22.02 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear22quarter02, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao22.03 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear22quarter03, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao22.04 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear22quarter04, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+rm(pnadcyear22quarter01, pnadcyear22quarter02, pnadcyear22quarter03, pnadcyear22quarter04)
+
+```
+
+
+```{r baixar dados para 2023,  include = FALSE, warning=FALSE, message=FALSE}
+pnadcyear23quarter01 <- get_pnadc(year=2023,quarter=1,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear23quarter02 <- get_pnadc(year=2023,quarter=2,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear23quarter03 <- get_pnadc(year=2023,quarter=3,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear23quarter04 <- get_pnadc(year=2023,quarter=4,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+```
+
+```{r rendimento habitual por nível de instrução para 2023,  include = FALSE, warning=FALSE, message=FALSE}
+rendimento.habitual.nivel.instrucao23.01 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear23quarter01, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao23.02 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear23quarter02, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao23.03 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear23quarter03, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao23.04 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear23quarter04, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rm(pnadcyear23quarter01, pnadcyear23quarter02, pnadcyear23quarter03, pnadcyear23quarter04)
+```
+
+```{r baixar dados para 2024,  include = FALSE, warning=FALSE, message=FALSE}
+pnadcyear24quarter01 <- get_pnadc(year=2024,quarter=1,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+pnadcyear24quarter02 <- get_pnadc(year=2024,quarter=2,labels = TRUE,deflator = TRUE,design = TRUE,vars = variaveis)
+```
+
+```{r rendimento habitual por nível de instrução para 2024,  include = FALSE, warning=FALSE, message=FALSE}
+rendimento.habitual.nivel.instrucao24.01 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear24quarter01, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+
+rendimento.habitual.nivel.instrucao24.02 <- svyby(formula = ~VD4019, by = ~VD3004, 
+                                                 design = pnadcyear24quarter02, FUN = svymean, 
+                                                 keep.names = FALSE, na.rm = TRUE)
+rm(pnadcyear24quarter01, pnadcyear24quarter02)
+```
+
+```{r organizando os dados,  include = FALSE, warning=FALSE, message=FALSE}
+rendimento.habitual.nivel.instrucao20.01$date <- as.Date("2020-03-30")
+rendimento.habitual.nivel.instrucao20.02$date <- as.Date("2020-06-30")
+rendimento.habitual.nivel.instrucao20.03$date <- as.Date("2020-09-30")
+rendimento.habitual.nivel.instrucao20.04$date <- as.Date("2020-12-30")
+rendimento.habitual.nivel.instrucao21.01$date <- as.Date("2021-03-30")
+rendimento.habitual.nivel.instrucao21.02$date <- as.Date("2021-06-30")
+rendimento.habitual.nivel.instrucao21.03$date <- as.Date("2021-09-30")
+rendimento.habitual.nivel.instrucao21.04$date <- as.Date("2021-12-30")
+rendimento.habitual.nivel.instrucao22.01$date <- as.Date("2022-03-30")
+rendimento.habitual.nivel.instrucao22.02$date <- as.Date("2022-06-30")
+rendimento.habitual.nivel.instrucao22.03$date <- as.Date("2022-09-30")
+rendimento.habitual.nivel.instrucao22.04$date <- as.Date("2022-12-30")
+rendimento.habitual.nivel.instrucao23.01$date <- as.Date("2023-03-30")
+rendimento.habitual.nivel.instrucao23.02$date <- as.Date("2023-06-30")
+rendimento.habitual.nivel.instrucao23.03$date <- as.Date("2023-09-30")
+rendimento.habitual.nivel.instrucao23.04$date <- as.Date("2023-12-30")
+rendimento.habitual.nivel.instrucao24.01$date <- as.Date("2024-03-30")
+rendimento.habitual.nivel.instrucao24.02$date <- as.Date("2024-06-30")
+
+
+rendimento.habitual.nivel.instrucao <- rbind(rendimento.habitual.nivel.instrucao20.01,
+                                        rendimento.habitual.nivel.instrucao20.02,
+                                        rendimento.habitual.nivel.instrucao20.03,
+                                        rendimento.habitual.nivel.instrucao20.04,
+                                        rendimento.habitual.nivel.instrucao21.01,
+                                        rendimento.habitual.nivel.instrucao21.02,
+                                        rendimento.habitual.nivel.instrucao21.03,
+                                        rendimento.habitual.nivel.instrucao21.04,
+                                        rendimento.habitual.nivel.instrucao22.01,
+                                        rendimento.habitual.nivel.instrucao22.02,
+                                        rendimento.habitual.nivel.instrucao22.03,
+                                        rendimento.habitual.nivel.instrucao22.04,
+                                        rendimento.habitual.nivel.instrucao23.01,
+                                        rendimento.habitual.nivel.instrucao23.02,
+                                        rendimento.habitual.nivel.instrucao23.03,
+                                        rendimento.habitual.nivel.instrucao23.04,
+                                        rendimento.habitual.nivel.instrucao24.01,
+                                        rendimento.habitual.nivel.instrucao24.02)
+
+rm(rendimento.habitual.nivel.instrucao20.01,
+   rendimento.habitual.nivel.instrucao20.02,
+   rendimento.habitual.nivel.instrucao20.03,
+   rendimento.habitual.nivel.instrucao20.04,
+   rendimento.habitual.nivel.instrucao21.01,
+   rendimento.habitual.nivel.instrucao21.02,
+   rendimento.habitual.nivel.instrucao21.03,
+   rendimento.habitual.nivel.instrucao21.04,
+   rendimento.habitual.nivel.instrucao22.01,
+   rendimento.habitual.nivel.instrucao22.02,
+   rendimento.habitual.nivel.instrucao22.03,
+   rendimento.habitual.nivel.instrucao22.04,
+   rendimento.habitual.nivel.instrucao23.01,
+   rendimento.habitual.nivel.instrucao23.02,
+   rendimento.habitual.nivel.instrucao23.03,
+   rendimento.habitual.nivel.instrucao23.04,
+   rendimento.habitual.nivel.instrucao24.01,
+   rendimento.habitual.nivel.instrucao24.02)
+```
+
+```{r construindo o gráfico,  include = FALSE, warning=FALSE, message=FALSE}
+grafico <- ggplot(rendimento.habitual.nivel.instrucao, aes(x = date, y = VD4019, color = VD3004))  + 
+  geom_line() +
+  theme_economist() +
+  labs(x = "Data", 
+       y = "Rendimento Habitual (em R$)",
+       title = "Rendimento habitual por trimestre segundo níveis de instrução.",
+       caption = "Fonte: PNADc") + 
+  theme(legend.title = element_blank(),
+        legend.text = element_text(size = 6),
+        axis.text.x = element_text(angle = 90, size = 7),
+        axis.text.y = element_text(size = 7),
+        title = element_text(size = 8)) +
+  scale_x_date(limits = c(min(rendimento.habitual.nivel.instrucao$date), 
+                          max(rendimento.habitual.nivel.instrucao$date)),
+               breaks = "3 month")
+
+```
+
+```{r}
+grafico
+```
