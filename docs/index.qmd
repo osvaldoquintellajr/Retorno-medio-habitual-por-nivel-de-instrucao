@@ -1,0 +1,294 @@
+---
+title: "Rendimento habitual médio por nível de instrução"
+author: 
+  - name: "Osvaldo Martins Quintella Junior"
+    email: "osvaldoquintellajr@gmail.com"
+date: today
+format: 
+  html:
+    embed-resources: true
+    df-print: paged
+    fig-align: center
+    toc: true
+    repo-url: "https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao"
+bibliography: references.bib
+---
+
+## Introdução
+
+A relação entre o nível de instrução e a remuneração no mercado de trabalho brasileiro é um indicador central para a compreensão da desigualdade e do retorno sobre o investimento em capital humano [@quadlin2023a; @budig2021a; @conwell2021]. Este projeto utiliza microdados trimestrais da Pesquisa Nacional por Amostra de Domicílios Contínua (PNADc) do IBGE para analisar a evolução do rendimento habitual médio real da população ocupada. Todas as estimativas consideram o desenho amostral complexo da pesquisa. Os rendimentos nominais foram deflacionados para uma base de preços constante, permitindo a comparação histórica .
+
+\[O script completo desenvolvido em R com as rotinas de extração, limpeza e empilhamento dos microdados brutos do IBGE pode ser acessado neste repositório\](<https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao/blob/main/scripts/preparar_dados.R>).
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: true
+#| code-fold: true
+
+#Carregar os pacotes necessários
+library(tidyverse)
+library(survey)
+library(broom)
+library(kableExtra)
+library(arrow)
+```
+
+## Resultados
+
+Abaixo, é possível visualizar a tendência histórica da renda média real segregada pelos níveis de escolaridade. O gráfico ilustra o comportamento do 'prêmio salarial' educacional, evidenciando as disparidades de remuneração entre os trabalhadores com ensino superior completo e aqueles com menores níveis de instrução ao longo do tempo.
+
+```{r}
+#| echo: true
+#| code-fold: true
+#Criar gráfico de tendência da renda média habitualmente recebida de acordo com o nível de escolaridade.
+
+lista_pnad_completa_rendimento_habitual <- read_parquet("D:/Documentos/github/Retorno-medio-habitual-por-nivel-de-instrucao/lista_pnad_completa_rendimento_habitual.parquet")
+
+lista_pnad_completa_rendimento_habitual <- lista_pnad_completa_rendimento_habitual |> separate(col = chave, into = c("ano", "trimestre"), sep = "_", remove = FALSE, convert = TRUE) |>
+  mutate(
+    tempo = ano +(trimestre - 1) / 4,
+    VD3004 = factor(
+      VD3004, levels = c(
+      "Sem instrução e menos de 1 ano de estudo",
+      "Fundamental incompleto ou equivalente",
+      "Fundamental completo ou equivalente",
+      "Médio incompleto ou equivalente",
+      "Médio completo ou equivalente",
+      "Superior incompleto ou equivalente", 
+      "Superior completo"
+      )
+    )
+  ) |>
+  arrange(
+    ano, trimestre
+  )
+
+ggplot(lista_pnad_completa_rendimento_habitual, mapping = aes(x = tempo, y = VD4016_real, group = VD3004, color = VD3004)) +
+  geom_point() +
+  geom_line() +
+  labs(
+    title = "Rendimento médio habitualmente recebido no trabalho principal para\n pessoas de 14 ou mais de idade. ",
+    subtitle = "(Valores deflacionados para março de 2026)",
+    x = "Ano",
+    y = "Rendimento (R$)"
+  ) +
+  scale_x_continuous(breaks = seq(min(lista_pnad_completa_rendimento_habitual$ano), max(lista_pnad_completa_rendimento_habitual$ano), 1)) +
+  scale_y_continuous(
+    breaks = seq(floor(min(lista_pnad_completa_rendimento_habitual$VD4016_real)/1000) * 1000, ceiling(max(lista_pnad_completa_rendimento_habitual$VD4016_real)/1000) * 1000
+, 1000), labels = scales::number_format(prefix = "R$")
+) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90), 
+    legend.position = "bottom",
+    legend.spacing.y = unit(0.01, "cm"), 
+    legend.title = element_blank(),
+    text = element_text(size = 11)
+  ) + 
+  guides(
+    color = guide_legend(ncol = 2)
+  )
+
+rm(lista_pnad_completa_rendimento_habitual)
+
+invisible(gc())
+
+```
+
+É possível verificar que os indivíduos com ensino superior, em média, recebem salários mais elevados em comparação com os indivíduos que não possuem ensino superior completo. Nota-se também uma queda no prêmio salarial ao longo dos anos. Entretanto, essa disparidade salarial é estatisticamente significativa? É possível afirmar que o ensino superior garante, em média, salários mais elevados quando controlamos por outras características do trabalhador? E o que podemos afirmar sobre a queda do prêmio salarial ao longo dos anos? Este resultado é estatisticamente significativo? Na tabela abaixo, são apresentados os resultados dos coeficientes do modelo de regressão com dados empilhados.
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+pnad_completa_regressao <- read_parquet("D:/Documentos/github/Retorno-medio-habitual-por-nivel-de-instrucao/pnad_completa_regressao.parquet")
+    
+    design_pnad_completa_regressao <- svydesign(data = pnad_completa_regressao, ids = ~ UPA, strata = ~ Estrato, weights = ~ V1032, nest = TRUE)
+    
+    rm(pnad_completa_regressao)
+    
+    invisible(gc())
+    
+    design_pnad_completa_regressao$variables <- mutate(design_pnad_completa_regressao$variables, 
+                                 VD4016_real = VD4016*CO1,
+                                 log_renda = log(VD4016_real),
+                                 MV2007 = as_factor(case_when(
+                                   V2007 == "1" ~ "Masculino",
+                                   V2007 == "2" ~ "Feminino"
+                                 )),
+                                 MV2007 = fct_relevel(MV2007, "Masculino"),
+                                 MVD3004 = as_factor(case_when(
+                                   VD3004 %in% c("1", "2", "3", "4", "5", "6") ~ "Sem_ensino_superior",
+                                   VD3004 == "7" ~ "Superior_completo",
+                                   .default = NA_character_
+                                 )),
+                                 MVD3004 = fct_relevel(MVD3004, "Sem_ensino_superior"),
+                                 MV2010 = as_factor(case_when(
+                                   V2010 == "1" ~ "Branca",
+                                   V2010 == "2" ~ "Preta",
+                                   V2010 == "3" ~ "Amarela",
+                                   V2010 == "4" ~ "Parda",
+                                   V2010 == "5" ~"Indigena",
+                                   .default = NA_character_
+                                   )),
+                                 MV2010 = fct_relevel(MV2010, "Branca"),
+                                 MUF = as_factor(UF),
+                                 Ano = as_factor(Ano),
+                                 Ano = fct_relevel(Ano, "2012"),
+                                 MVVD4009 = as_factor(case_when(
+                                   VD4009 %in% c("05", "06", "07") ~ "Setor_publico", 
+                                   VD4009 %in% c("01", "02", "03", "04", "08", "09", "10") ~ "Setor_privado",
+                                   .default = NA_character_
+                                 )),
+                                 MVVD4009 = fct_relevel(MVVD4009, "Setor_privado")
+                                 )
+    
+    invisible(gc())
+    
+    design_pnad_completa_regressao$variables <- rename(design_pnad_completa_regressao$variables, 
+                                 Idade = V2009,
+                                 sexo = MV2007,
+                                 cor_raca = MV2010,
+                                 Ensino_superior = MVD3004,
+                                 Unidade_federacao = MUF,
+                                 Setor_publico = MVVD4009)
+    
+    options(survey.lonely.psu = "adjust")
+    
+    my_model <- svyglm(formula = log_renda ~ Ano + Ensino_superior + Ano:Ensino_superior + Idade + I(Idade^2) + sexo + cor_raca + Setor_publico+ Unidade_federacao, 
+                        design = design_pnad_completa_regressao)
+    
+    rm(design_pnad_completa_regressao)
+    
+    invisible(gc())
+    
+    tabela_coef <- tidy(my_model)
+    
+    tabela_formatada <- tabela_coef |>
+      filter(!str_detect(term, "Unidade_federacao")) |>
+      mutate(
+        term = case_when(
+          term == "(Intercept)" ~ "Intercepto (Base 2012)",
+          term == "Ensino_superiorSuperior_completo" ~ "Prêmio Base: Ensino Superior (2012)",
+          term == "Idade" ~ "Idade (Anos)",
+          term == "I(Idade^2)" ~ "Idade ao Quadrado",
+          term == "sexoMasculino" ~ "Gênero: Masculino",
+          term == "Setor_publicoSetor_publico" ~ "Setor: Público",
+          str_detect(term, "^Ano\\d{4}$") ~ str_replace(term, "Ano", "Efeito Fixo de Ano: "),
+          str_detect(term, "cor_raca") ~ str_replace(term, "cor_raca", "Cor/Raça: "),
+          str_detect(term, ":Ensino_superiorSuperior_completo") ~ str_replace(term, "Ano(\\d{4}):.*", "Variação do Prêmio em \\1"),
+          TRUE ~ term
+        ),
+        estimate = round(estimate, 4),
+        std.error = round(std.error, 4),
+        statistic = round(statistic, 2),
+        p.value = if_else(p.value < 0.001, "< 0.001", as.character(round(p.value, 4)))
+      ) |>
+      rename(
+        `Variável` = term,
+        `Coeficiente` = estimate,
+        `Erro-Padrão` = std.error,
+        `Estatística t` = statistic,
+        `Valor-p` = p.value
+      ) |>
+      arrange(
+        Variável != "Intercepto (Base 2012)",
+        Variável
+      )
+    
+    
+    tabela_formatada |>
+      kbl(
+        caption = "Tabela 1: Estimativas do Modelo de Regressão (2012 - 2025)",
+        align = c("l", "c", "c", "c", "c")
+      ) |>
+      kable_styling(
+        bootstrap_options = c("striped"),
+        full_width = NULL,
+        html_font = "Arial"
+      ) |>
+      column_spec(1, width = "8cm") |>
+      column_spec(2:5, width = "3cm") |>
+      footnote(general = "A variável dependente é o Logaritmo da Renda Habitual. Controles para unidade da federação foram incluídos na estimação, mas omitidos desta visualização para melhor visualização dos resultados. Categorias omitidas (base): Ano de 2012, Mulheres, Cor/Raça Branca e Setor Privado.")
+```
+
+Os resultados apresentados na tabela acima confirmam o que se verifica no gráfico anterior. De fato, em 2012, o prêmio salarial para quem tem ensino superior - controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação - é `r tabela_formatada[13, "Coeficiente"] |> pull()` log-pontos. Entretanto, esse prêmio salarial varia ao longo do tempo. Verifica-se uma queda do prêmio ao longo dos anos, sendo esta queda de `r tabela_formatada[32, "Coeficiente"] |> pull() * (-1)` log-pontos em 2025 em relação ao ano base, que é 2012. Ou seja, apesar de haver no Brasil um prêmio salarial significativo, este prêmio tem apresentado uma redução ao longo do tempo. É importante notar também que a variação do prêmio salarial nos anos de 2013, 2014 e 2016 não é estatísticamente signicafiva. Ou seja, não podemos afirmar que houve uma variação no prêmio salarial para estes anos em relação ao ano base. Abaixo, vamos traduzir os valores dos coeficientes para valores percentuais e visualizar graficamente como evolui o prêmio salarial ao longo dos anos.
+
+```{r}
+#| echo: true
+#| code-fold: true
+
+
+tabela_coef <- tidy(my_model, conf.int = TRUE)
+
+matriz_vcov <- vcov(my_model)
+
+rm(my_model)
+
+invisible(gc())
+
+
+base_2012 <- tabela_coef |> filter(term == "Ensino_superiorSuperior_completo")
+premio_base <- base_2012$estimate
+se_base <- base_2012$std.error
+nome_termo_base <- "Ensino_superiorSuperior_completo"
+
+
+dados_grafico <- tabela_coef |>
+  filter(str_detect(term, ":Ensino_superiorSuperior_completo")) |>
+  rowwise() |>
+  mutate(
+    Ano = as.numeric(str_extract(term, "\\d{4}")),
+    
+    covariancia = matriz_vcov[nome_termo_base, term], 
+    
+    Log_Total = premio_base + estimate,
+    Var_Total = (se_base^2) + (std.error^2) + (2*covariancia),
+    
+    SE_Total = sqrt(Var_Total),
+    
+    Log_Low = Log_Total - (1.96 * SE_Total), 
+    Log_High = Log_Total + (1.96 * SE_Total),
+    
+    Premio_Perc = (exp(Log_Total) - 1),
+    Premio_Perc_Low = (exp(Log_Low) - 1),
+    Premio_Perc_High = (exp(Log_High) - 1)
+  ) |>
+  ungroup() |>
+  select(Ano, Premio_Perc, Premio_Perc_Low, Premio_Perc_High)
+
+dados_grafico <- bind_rows(
+  tibble(
+    Ano = 2012, 
+    Premio_Perc = (exp(premio_base) - 1),
+    Premio_Perc_Low = (exp(base_2012$conf.low) - 1),
+    Premio_Perc_High = (exp(base_2012$conf.high) - 1)
+  ),
+  dados_grafico
+)
+
+grafico_premio <- ggplot(dados_grafico, aes(x = Ano, y = Premio_Perc)) +
+  geom_ribbon(aes(ymin = Premio_Perc_Low, ymax = Premio_Perc_High), fill = "grey", alpha = 0.5) +
+  geom_line(color = "blue", linewidth = 1.2) +
+  geom_point(color = "red", size = 3) +
+  scale_x_continuous(breaks = 2012:2025) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)
+                     ) +
+  labs(
+    title = "Evolução do Prêmio Salarial do Ensino Superior (2012 - 2025)",
+    subtitle = "Vantagem percentual estimada em relação a trabalhadores sem diploma (Intervalo de 95%)",
+    x = "Ano",
+    y = "Prêmio Salarial Estimado (%)",
+    caption = "Nota: Controlado por idade, sexo, raça, setor e Unidade da Federação.\nFonte: Microdados PNAD Contínua (IBGE) - Elaboração Própria"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    panel.grid.minor = element_blank()
+  )
+
+grafico_premio
+```
+
+## Referências Bibliográficas
