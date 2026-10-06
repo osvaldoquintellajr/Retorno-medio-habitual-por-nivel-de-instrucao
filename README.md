@@ -32,7 +32,7 @@ Estre projeto analia o **rendimento habitual médio real** por nível de instru�
 
    $$\log(Y_i) = \alpha + \beta \cdot \text{Superior}_i + \gamma X_i + \varepsilon_i$$
    
-   em que: $$X_i$$ é um vetor de controles que incluem: idade, idade², sexo, cor/raça, setor de atividade e unidade da federação.
+   em que: $$Superior$$ é uma variável dummy que é igual a 1 para quem tem ensino superior completo e zero caso contrário; $$X_i$$ é um vetor de controles que incluem: idade, idade², sexo, cor/raça, setor de atividade e unidade da federação.
    
 O resultado da análise pode ser acessado por meio do link abaixo:
 
