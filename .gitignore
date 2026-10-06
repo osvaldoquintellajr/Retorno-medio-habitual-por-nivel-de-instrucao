@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+lista_pnad_completa_rendimento_habitual.parquet
+pnad_completa_regressao.parquet 
+Retorno-medio-habitual-por-nivel-de-instrucao.Rproj
+docs/references.bib
+docs/index_files
+docs/index.rmarkdown
+teste.R
+pnad_completa_coeficientes.parquet

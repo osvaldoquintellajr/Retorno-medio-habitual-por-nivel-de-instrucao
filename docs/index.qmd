@@ -1,0 +1,153 @@
+---
+title: "Rendimento habitual médio por nível de instrução"
+author: 
+  - name: "Osvaldo Martins Quintella Junior"
+    email: "osvaldoquintellajr@gmail.com"
+date: today
+format: 
+  html:
+    embed-resources: true
+    df-print: paged
+    fig-align: center
+    toc: true
+    repo-url: "https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao"
+bibliography: references.bib
+---
+
+## Introdução
+
+A relação entre o nível de instrução e a remuneração no mercado de trabalho brasileiro é um indicador central para a compreensão da desigualdade e do retorno sobre o investimento em capital humano [@costa2020heterogeneidade; @foguel2000public; @quadlin2023a; @budig2021a; @conwell2021; ]. Este projeto utiliza microdados da Pesquisa Nacional por Amostra de Domicílios Contínua (PNADc) do IBGE para analisar a evolução do rendimento habitual médio real da população ocupada por nível de instrução. Todas as estimativas consideram o desenho amostral complexo da pesquisa. Os rendimentos nominais foram deflacionados para uma base de preços constante, permitindo a comparação histórica .
+
+\[O script completo desenvolvido em R com as rotinas de extração, limpeza e empilhamento dos microdados brutos do IBGE pode ser acessado neste repositório\](<https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao/blob/main/scripts/preparar_dados.R>).
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: true
+#| code-fold: true
+
+#Carregar os pacotes necessários
+library(tidyverse)
+library(survey)
+library(broom)
+library(kableExtra)
+library(arrow)
+```
+
+## Resultados
+
+Abaixo, é possível visualizar a tendência histórica da renda média real segregada pelos níveis de escolaridade. O gráfico ilustra o comportamento do 'prêmio salarial' educacional, evidenciando as disparidades de remuneração entre os trabalhadores com ensino superior completo e aqueles com menores níveis de instrução ao longo do tempo.
+
+```{r}
+#| echo: true
+#| code-fold: true
+#Criar gráfico de tendência da renda média habitualmente recebida de acordo com o nível de escolaridade.
+
+lista_pnad_completa_rendimento_habitual <- read_parquet("D:/Documentos/github/Retorno-medio-habitual-por-nivel-de-instrucao/lista_pnad_completa_rendimento_habitual.parquet")
+
+lista_pnad_completa_rendimento_habitual <- lista_pnad_completa_rendimento_habitual |> separate(col = chave, into = c("ano", "trimestre"), sep = "_", remove = FALSE, convert = TRUE) |>
+  mutate(
+    tempo = ano + (trimestre - 1) / 4,
+    VD3004 = factor(
+      VD3004, levels = c(
+      "Sem instrução e menos de 1 ano de estudo",
+      "Fundamental incompleto ou equivalente",
+      "Fundamental completo ou equivalente",
+      "Médio incompleto ou equivalente",
+      "Médio completo ou equivalente",
+      "Superior incompleto ou equivalente", 
+      "Superior completo"
+      )
+    )
+  ) |>
+  arrange(
+    ano, trimestre
+  )
+
+ggplot(lista_pnad_completa_rendimento_habitual, mapping = aes(x = tempo, y = VD4016_real, group = VD3004, color = VD3004)) +
+  geom_point() +
+  geom_line() +
+  labs(
+    title = "Rendimento médio habitualmente recebido no trabalho principal para\n pessoas de 14 ou mais de idade. ",
+    subtitle = "(Valores deflacionados para março de 2025)",
+    x = "Ano",
+    y = "Rendimento (R$)"
+  ) +
+  scale_x_continuous(breaks = seq(min(lista_pnad_completa_rendimento_habitual$ano), max(lista_pnad_completa_rendimento_habitual$ano), 1)) +
+  scale_y_continuous(
+    breaks = seq(floor(min(lista_pnad_completa_rendimento_habitual$VD4016_real)/1000) * 1000, ceiling(max(lista_pnad_completa_rendimento_habitual$VD4016_real)/1000) * 1000
+, 1000), labels = scales::number_format(prefix = "R$")
+) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 90), 
+    legend.position = "bottom",
+    legend.spacing.y = unit(0.01, "cm"), 
+    legend.title = element_blank(),
+    text = element_text(size = 11)
+  ) + 
+  guides(
+    color = guide_legend(ncol = 2)
+  )
+
+rm(lista_pnad_completa_rendimento_habitual)
+
+invisible(gc())
+
+```
+
+É possível verificar que os indivíduos com ensino superior, em média, recebem salários mais elevados em comparação com os indivíduos que não possuem ensino superior completo. Nota-se também uma queda no prêmio salarial ao longo dos anos. Entretanto, essa disparidade salarial é estatisticamente significativa? É possível afirmar que o ensino superior está associado, em média, a salários mais elevados quando controlamos por outras características do trabalhador?
+
+```{r}
+#| echo: true
+#| code-fold: true
+#| label: tbl_coeficientes_premio
+#| tbl-cap: "Estimativas do coeficiente do prêmio salarial para enisno superior na equação minceriana (2012-2025)"
+
+coeficientes <- read_parquet("D:/Documentos/github/Retorno-medio-habitual-por-nivel-de-instrucao/pnad_completa_coeficientes.parquet")
+
+premio <- coeficientes |>
+  filter(term == "Ensino_superiorSuperior_completo") |>
+  mutate(
+    premio_perc = (exp(estimate) - 1) * 100,
+    premio_perc_low = (exp(conf.low) - 1) * 100,
+    premio_perc_high = (exp(conf.high) - 1) * 100,
+  ) |>
+  select(ano, estimate, std.error, conf.low, conf.high,
+         premio_perc, premio_perc_low, premio_perc_high) |>
+  arrange(ano)
+
+variacao_2025 <- premio |>
+  filter(ano == 2025) |>
+  mutate(
+    var_pp = premio_perc - premio |> filter(ano == 2012) |> pull(premio_perc),
+    var_log = estimate - premio |> filter(ano == 2012) |> pull(estimate)
+  )
+
+premio |>
+  transmute(
+    Ano = ano,
+    Coef = round(estimate, 4),
+    EP = round(std.error, 4),
+    `IC 95% (inf.)` = round(conf.low, 4),
+    `IC 95% (sup.)` = round(conf.high, 4),
+    `Prêmio (%)` = round(premio_perc, 2),
+    `Prêmio IC (inf.)` = round(premio_perc_low, 2),
+    `Prêmio IC (sup.)` = round(premio_perc_high, 2)
+    )  |>
+  kbl(
+    caption = "Estimativas do coeficiente do prêmio salarial para o ensino superior (2012-2025)",
+    align = c("l", "c", "c", "c", "c", "c", "c", "c")
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped"),
+    full_width = FALSE
+  )  |>
+  footnote(general = "A variável dependente é o Logaritmo da Renda Habitual (Preços de 2025, deflator CO2). Controles: idade, idade^2, sexo, setor de atividade, unidade da federação, cor/raça (coeficientes omitidos) para melhor visualização dos resultados. Cada linha é um modelo estimado separadamente para o ano.")   
+
+
+```
+
+Os resultados apresentados na tabela acima confirmam o que se verifica no gráfico anterior. De fato, em 2012, o prêmio salarial para quem tem ensino superior - controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação - é `r premio |> filter(ano == 2012) |> pull(premio_perc) |> round(2)`%. Entretanto, esse prêmio salarial varia ao longo do tempo. Verifica-se uma queda do prêmio salarial substancial: em 2025, o prêmio é de `r premio |> filter(ano == 2025) |> pull(premio_perc) |> round(2)`%, uma redução de `r variacao_2025 |> pull(var_pp) |> round(2)` pontos percentuais em relação a 2012.
+
+## Referências Bibliográficas
