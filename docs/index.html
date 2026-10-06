@@ -3852,7 +3852,7 @@ window.onload = function() {
 </details>
 </div>
 <p>Observa-se que os trabalhadores com ensino superior, em média, recebem salários mais elevados em comparação com os indivíduos que não possuem ensino superior completo. Nota-se também uma queda no prêmio salarial ao longo dos anos. Resta saber se essa associação é estatísticamente significativa e se persiste quando controlamos por outras características do trabalhador? A Tabela 1 apresenta os coeficientes estimados que capturam a associação entre ter ensino superior completo e o logaritmo do rendimento habitual médio, controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação.</p>
-<div class="cell" data-tbl-cap="Estimativas do coeficiente do prêmio salarial para enisno superior na equação minceriana (2012-2025)">
+<div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>coeficientes <span class="ot">&lt;-</span> <span class="fu">read_parquet</span>(<span class="st">&quot;D:/Documentos/github/Retorno-medio-habitual-por-nivel-de-instrucao/pnad_completa_coeficientes.parquet&quot;</span>)</span>
@@ -3888,20 +3888,21 @@ window.onload = function() {
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    )  <span class="sc">|&gt;</span></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kbl</span>(</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Tabela 1: Estimativas do coeficiente do prêmio salarial para o ensino superior (2012-2025)&quot;</span>,</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="fu">c</span>(<span class="st">&quot;l&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;c&quot;</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="st">&quot;c&quot;</span></span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
 <span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>),</span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  )  <span class="sc">|&gt;</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">footnote</span>(<span class="at">general =</span> <span class="st">&quot;A variável dependente é o Logaritmo da Renda Habitual (Preços de 2025, deflator CO2). Controles: idade, idade^2, sexo, setor de atividade, unidade da federação, cor/raça (coeficientes omitidos) para melhor visualização dos resultados. Cada linha é um modelo estimado separadamente para o ano.&quot;</span>)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">1</span>, <span class="at">width =</span> <span class="st">&quot;2cm&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">8</span>, <span class="at">width =</span> <span class="st">&quot;2cm&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
 <table class="table table-striped caption-top table-sm small">
-<caption>Estimativas do coeficiente do prêmio salarial para enisno superior na equação minceriana (2012-2025)</caption>
+<caption>Tabela 1: Estimativas do coeficiente do prêmio salarial para o ensino superior (2012-2025)</caption>
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">Ano</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">Ano</th>
 <th style="text-align: center;" data-quarto-table-cell-role="th">Coef</th>
 <th style="text-align: center;" data-quarto-table-cell-role="th">EP</th>
 <th style="text-align: center;" data-quarto-table-cell-role="th">IC 95% (inf.)</th>
@@ -3913,152 +3914,143 @@ window.onload = function() {
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">2012</td>
-<td style="text-align: center;">0.9398</td>
-<td style="text-align: center;">0.0109</td>
-<td style="text-align: center;">0.9182</td>
-<td style="text-align: center;">0.9613</td>
-<td style="text-align: center;">155.94</td>
-<td style="text-align: center;">150.48</td>
-<td style="text-align: center;">161.51</td>
+<td style="text-align: center; width: 2cm;">2012</td>
+<td style="text-align: center; width: 2cm;">0.9398</td>
+<td style="text-align: center; width: 2cm;">0.0109</td>
+<td style="text-align: center; width: 2cm;">0.9182</td>
+<td style="text-align: center; width: 2cm;">0.9613</td>
+<td style="text-align: center; width: 2cm;">155.94</td>
+<td style="text-align: center; width: 2cm;">150.48</td>
+<td style="text-align: center; width: 2cm;">161.51</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2013</td>
-<td style="text-align: center;">0.9356</td>
-<td style="text-align: center;">0.0110</td>
-<td style="text-align: center;">0.9138</td>
-<td style="text-align: center;">0.9574</td>
-<td style="text-align: center;">154.87</td>
-<td style="text-align: center;">149.38</td>
-<td style="text-align: center;">160.48</td>
+<td style="text-align: center; width: 2cm;">2013</td>
+<td style="text-align: center; width: 2cm;">0.9356</td>
+<td style="text-align: center; width: 2cm;">0.0110</td>
+<td style="text-align: center; width: 2cm;">0.9138</td>
+<td style="text-align: center; width: 2cm;">0.9574</td>
+<td style="text-align: center; width: 2cm;">154.87</td>
+<td style="text-align: center; width: 2cm;">149.38</td>
+<td style="text-align: center; width: 2cm;">160.48</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2014</td>
-<td style="text-align: center;">0.9336</td>
-<td style="text-align: center;">0.0113</td>
-<td style="text-align: center;">0.9113</td>
-<td style="text-align: center;">0.9558</td>
-<td style="text-align: center;">154.36</td>
-<td style="text-align: center;">148.75</td>
-<td style="text-align: center;">160.09</td>
+<td style="text-align: center; width: 2cm;">2014</td>
+<td style="text-align: center; width: 2cm;">0.9336</td>
+<td style="text-align: center; width: 2cm;">0.0113</td>
+<td style="text-align: center; width: 2cm;">0.9113</td>
+<td style="text-align: center; width: 2cm;">0.9558</td>
+<td style="text-align: center; width: 2cm;">154.36</td>
+<td style="text-align: center; width: 2cm;">148.75</td>
+<td style="text-align: center; width: 2cm;">160.09</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2015</td>
-<td style="text-align: center;">0.8910</td>
-<td style="text-align: center;">0.0126</td>
-<td style="text-align: center;">0.8661</td>
-<td style="text-align: center;">0.9160</td>
-<td style="text-align: center;">143.76</td>
-<td style="text-align: center;">137.75</td>
-<td style="text-align: center;">149.92</td>
+<td style="text-align: center; width: 2cm;">2015</td>
+<td style="text-align: center; width: 2cm;">0.8910</td>
+<td style="text-align: center; width: 2cm;">0.0126</td>
+<td style="text-align: center; width: 2cm;">0.8661</td>
+<td style="text-align: center; width: 2cm;">0.9160</td>
+<td style="text-align: center; width: 2cm;">143.76</td>
+<td style="text-align: center; width: 2cm;">137.75</td>
+<td style="text-align: center; width: 2cm;">149.92</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2016</td>
-<td style="text-align: center;">0.9133</td>
-<td style="text-align: center;">0.0137</td>
-<td style="text-align: center;">0.8863</td>
-<td style="text-align: center;">0.9403</td>
-<td style="text-align: center;">149.25</td>
-<td style="text-align: center;">142.61</td>
-<td style="text-align: center;">156.08</td>
+<td style="text-align: center; width: 2cm;">2016</td>
+<td style="text-align: center; width: 2cm;">0.9133</td>
+<td style="text-align: center; width: 2cm;">0.0137</td>
+<td style="text-align: center; width: 2cm;">0.8863</td>
+<td style="text-align: center; width: 2cm;">0.9403</td>
+<td style="text-align: center; width: 2cm;">149.25</td>
+<td style="text-align: center; width: 2cm;">142.61</td>
+<td style="text-align: center; width: 2cm;">156.08</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2017</td>
-<td style="text-align: center;">0.8842</td>
-<td style="text-align: center;">0.0129</td>
-<td style="text-align: center;">0.8587</td>
-<td style="text-align: center;">0.9096</td>
-<td style="text-align: center;">142.10</td>
-<td style="text-align: center;">136.02</td>
-<td style="text-align: center;">148.34</td>
+<td style="text-align: center; width: 2cm;">2017</td>
+<td style="text-align: center; width: 2cm;">0.8842</td>
+<td style="text-align: center; width: 2cm;">0.0129</td>
+<td style="text-align: center; width: 2cm;">0.8587</td>
+<td style="text-align: center; width: 2cm;">0.9096</td>
+<td style="text-align: center; width: 2cm;">142.10</td>
+<td style="text-align: center; width: 2cm;">136.02</td>
+<td style="text-align: center; width: 2cm;">148.34</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2018</td>
-<td style="text-align: center;">0.8673</td>
-<td style="text-align: center;">0.0121</td>
-<td style="text-align: center;">0.8435</td>
-<td style="text-align: center;">0.8911</td>
-<td style="text-align: center;">138.06</td>
-<td style="text-align: center;">132.45</td>
-<td style="text-align: center;">143.79</td>
+<td style="text-align: center; width: 2cm;">2018</td>
+<td style="text-align: center; width: 2cm;">0.8673</td>
+<td style="text-align: center; width: 2cm;">0.0121</td>
+<td style="text-align: center; width: 2cm;">0.8435</td>
+<td style="text-align: center; width: 2cm;">0.8911</td>
+<td style="text-align: center; width: 2cm;">138.06</td>
+<td style="text-align: center; width: 2cm;">132.45</td>
+<td style="text-align: center; width: 2cm;">143.79</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2019</td>
-<td style="text-align: center;">0.8640</td>
-<td style="text-align: center;">0.0100</td>
-<td style="text-align: center;">0.8444</td>
-<td style="text-align: center;">0.8837</td>
-<td style="text-align: center;">137.27</td>
-<td style="text-align: center;">132.65</td>
-<td style="text-align: center;">141.98</td>
+<td style="text-align: center; width: 2cm;">2019</td>
+<td style="text-align: center; width: 2cm;">0.8640</td>
+<td style="text-align: center; width: 2cm;">0.0100</td>
+<td style="text-align: center; width: 2cm;">0.8444</td>
+<td style="text-align: center; width: 2cm;">0.8837</td>
+<td style="text-align: center; width: 2cm;">137.27</td>
+<td style="text-align: center; width: 2cm;">132.65</td>
+<td style="text-align: center; width: 2cm;">141.98</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2022</td>
-<td style="text-align: center;">0.8297</td>
-<td style="text-align: center;">0.0095</td>
-<td style="text-align: center;">0.8109</td>
-<td style="text-align: center;">0.8485</td>
-<td style="text-align: center;">129.25</td>
-<td style="text-align: center;">124.98</td>
-<td style="text-align: center;">133.61</td>
+<td style="text-align: center; width: 2cm;">2022</td>
+<td style="text-align: center; width: 2cm;">0.8297</td>
+<td style="text-align: center; width: 2cm;">0.0095</td>
+<td style="text-align: center; width: 2cm;">0.8109</td>
+<td style="text-align: center; width: 2cm;">0.8485</td>
+<td style="text-align: center; width: 2cm;">129.25</td>
+<td style="text-align: center; width: 2cm;">124.98</td>
+<td style="text-align: center; width: 2cm;">133.61</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2023</td>
-<td style="text-align: center;">0.8196</td>
-<td style="text-align: center;">0.0099</td>
-<td style="text-align: center;">0.8000</td>
-<td style="text-align: center;">0.8392</td>
-<td style="text-align: center;">126.96</td>
-<td style="text-align: center;">122.55</td>
-<td style="text-align: center;">131.46</td>
+<td style="text-align: center; width: 2cm;">2023</td>
+<td style="text-align: center; width: 2cm;">0.8196</td>
+<td style="text-align: center; width: 2cm;">0.0099</td>
+<td style="text-align: center; width: 2cm;">0.8000</td>
+<td style="text-align: center; width: 2cm;">0.8392</td>
+<td style="text-align: center; width: 2cm;">126.96</td>
+<td style="text-align: center; width: 2cm;">122.55</td>
+<td style="text-align: center; width: 2cm;">131.46</td>
 </tr>
 <tr class="odd">
-<td style="text-align: left;">2024</td>
-<td style="text-align: center;">0.7947</td>
-<td style="text-align: center;">0.0090</td>
-<td style="text-align: center;">0.7769</td>
-<td style="text-align: center;">0.8125</td>
-<td style="text-align: center;">121.37</td>
-<td style="text-align: center;">117.46</td>
-<td style="text-align: center;">125.35</td>
+<td style="text-align: center; width: 2cm;">2024</td>
+<td style="text-align: center; width: 2cm;">0.7947</td>
+<td style="text-align: center; width: 2cm;">0.0090</td>
+<td style="text-align: center; width: 2cm;">0.7769</td>
+<td style="text-align: center; width: 2cm;">0.8125</td>
+<td style="text-align: center; width: 2cm;">121.37</td>
+<td style="text-align: center; width: 2cm;">117.46</td>
+<td style="text-align: center; width: 2cm;">125.35</td>
 </tr>
 <tr class="even">
-<td style="text-align: left;">2025</td>
-<td style="text-align: center;">0.7995</td>
-<td style="text-align: center;">0.0096</td>
-<td style="text-align: center;">0.7806</td>
-<td style="text-align: center;">0.8183</td>
-<td style="text-align: center;">122.43</td>
-<td style="text-align: center;">118.28</td>
-<td style="text-align: center;">126.67</td>
+<td style="text-align: center; width: 2cm;">2025</td>
+<td style="text-align: center; width: 2cm;">0.7995</td>
+<td style="text-align: center; width: 2cm;">0.0096</td>
+<td style="text-align: center; width: 2cm;">0.7806</td>
+<td style="text-align: center; width: 2cm;">0.8183</td>
+<td style="text-align: center; width: 2cm;">122.43</td>
+<td style="text-align: center; width: 2cm;">118.28</td>
+<td style="text-align: center; width: 2cm;">126.67</td>
 </tr>
-</tbody><tfoot>
-<tr class="odd">
-<td style="text-align: left; padding: 0;"><span style="font-style: italic;">Note: </span></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-</tr>
-<tr class="even">
-<td style="text-align: left; padding: 0;"><sup></sup> A variável dependente é o Logaritmo da Renda Habitual (Preços de 2025, deflator CO2). Controles: idade, idade^2, sexo, setor de atividade, unidade da federação, cor/raça (coeficientes omitidos) para melhor visualização dos resultados. Cada linha é um modelo estimado separadamente para o ano.</td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-<td style="text-align: center;"></td>
-</tr>
-</tfoot>
-
+</tbody>
 </table>
 </div>
 </div>
-<p>Os resultados apresentados na tabela acima confirmam o que se verifica no gráfico anterior. De fato, em 2012, o prêmio salarial para quem tem ensino superior - controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação - é 155.94%. Entretanto, esse prêmio salarial varia ao longo do tempo. Verifica-se uma queda do prêmio salarial substancial: em 2025, o prêmio é de 122.43%, uma redução de -33.5 pontos percentuais em relação a 2012.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Nota:</strong> A variável dependente é o logaritmo da renda habitual (preços médios de 2025, deflator CO2). Controles: idade, idade², sexo, setor de atividade, unidade da federação e cor/raça (coeficientes omitidos). Cada linha é um modelo estimado separadamente para o ano.</p>
+</div>
+</div>
+<p>Os resultados apresentados na tabela 1 confirmam o que se verifica no gráfico anterior. De fato, em 2012, o prêmio salarial para quem tem ensino superior - controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação - é 155.94%. Entretanto, esse prêmio salarial varia ao longo do tempo. Verifica-se uma queda do prêmio salarial substancial: em 2025, o prêmio é de 122.43%, uma redução de -33.5 pontos percentuais em relação a 2012.</p>
 </section>
 <section id="referências-bibliográficas" class="level2 unnumbered">
 
