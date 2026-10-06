@@ -18,7 +18,7 @@ bibliography: references.bib
 
 A relação entre o nível de instrução e a remuneração no mercado de trabalho brasileiro é um indicador central para a compreensão da desigualdade e do retorno sobre o investimento em capital humano [@costa2020heterogeneidade; @foguel2000public; @quadlin2023a; @budig2021a; @conwell2021; ]. Este projeto utiliza microdados da Pesquisa Nacional por Amostra de Domicílios Contínua (PNADc) do IBGE para analisar a evolução do rendimento habitual médio real da população ocupada por nível de instrução. Além disso, foram estimadas equações mincerianas utilizando dados anuais da PNADc com o objetivo de verificar a magnitude do prêmio salarial entre os anos de 2012 e 2025. Todas as estimativas consideram o desenho amostral complexo da pesquisa. Os rendimentos nominais foram deflacionados para uma base de preços constante, permitindo a comparação histórica .
 
-\[O script completo desenvolvido em R com as rotinas de extração, limpeza e empilhamento dos microdados brutos do IBGE pode ser acessado neste repositório\](<https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao/blob/main/scripts/preparar_dados.R>).
+\[O script completo desenvolvido em R com a rotina de importação dos dados, limpeza, cálculo dos indicadores e modelagem econométrica a partir dos microdados brutos do IBGE pode ser acessado neste repositório\](<https://github.com/osvaldoquintellajr/Retorno-medio-habitual-por-nivel-de-instrucao/blob/main/scripts/preparar_dados.R>).
 
 ```{r}
 #| message: false
@@ -96,7 +96,7 @@ invisible(gc())
 
 ```
 
-É possível verificar que os indivíduos com ensino superior, em média, recebem salários mais elevados em comparação com os indivíduos que não possuem ensino superior completo. Nota-se também uma queda no prêmio salarial ao longo dos anos. Entretanto, essa disparidade salarial é estatisticamente significativa? É possível afirmar que o ensino superior está associado, em média, a salários mais elevados quando controlamos por outras características do trabalhador?
+Observa-se que os trabalhadores com ensino superior, em média, recebem salários mais elevados em comparação com os indivíduos que não possuem ensino superior completo. Nota-se também uma queda no prêmio salarial ao longo dos anos. Resta saber se essa associação é estatísticamente significativa e se persiste quando controlamos por outras características do trabalhador? A Tabela 1 apresenta os coeficientes estimados que capturam a associação entre ter ensino superior completo e o logaritmo do rendimento habitual médio, controlando por idade, sexo, cor/raça, setor de atividade e unidade da federação. 
 
 ```{r}
 #| echo: true
@@ -136,7 +136,7 @@ premio |>
     `Prêmio IC (sup.)` = round(premio_perc_high, 2)
     )  |>
   kbl(
-    caption = "Estimativas do coeficiente do prêmio salarial para o ensino superior (2012-2025)",
+    caption = "Tabela 1: Estimativas do coeficiente do prêmio salarial para o ensino superior (2012-2025)",
     align = c("l", "c", "c", "c", "c", "c", "c", "c")
   ) |>
   kable_styling(
