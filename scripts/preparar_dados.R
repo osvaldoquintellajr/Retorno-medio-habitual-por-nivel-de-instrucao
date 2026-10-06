@@ -123,7 +123,7 @@ for(ano in anos_a_processar){
     my_pnadc_design <- pnadc_design(my_pnadc)
       
     my_pnadc_design$variables <- mutate(my_pnadc_design$variables, 
-                                                       VD4016_real = VD4016*CO1,
+                                                       VD4016_real = VD4016*CO2,
                                                        log_renda = log(VD4016_real),
                                                        MV2007 = as_factor(case_when(
                                                          V2007 == "1" ~ "Masculino",
